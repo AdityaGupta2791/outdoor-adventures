@@ -1,13 +1,7 @@
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
+import AppRoutes from './routes/AppRoutes'
 
 function App() {
-  return (
-    <>
-      <Navbar />
-      <Hero />
-    </>
-  )
+  return <AppRoutes />
 }
 
 export default App

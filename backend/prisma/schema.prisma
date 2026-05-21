@@ -1,13 +1,91 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Outdoor Adventures — Prisma schema
+// Module 1: Trip Catalog
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Difficulty {
+  EASY
+  MODERATE
+  DIFFICULT
+  CHALLENGING
+}
+
+enum TripStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum DepartureStatus {
+  OPEN
+  FULL
+  CANCELLED
+  COMPLETED
+}
+
+model TripCategory {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String?
+  coverImage   String?
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  trips Trip[]
+
+  @@index([displayOrder])
+}
+
+model Trip {
+  id               String     @id @default(cuid())
+  slug             String     @unique
+  title            String
+  shortDescription String
+  description      String
+  categoryId       String
+  difficulty       Difficulty
+  durationDays     Int
+  location         String
+  basePriceInPaise Int
+  coverImage       String
+  images           String[]
+  itinerary        Json
+  inclusions       String[]
+  exclusions       String[]
+  status           TripStatus @default(DRAFT)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  category   TripCategory    @relation(fields: [categoryId], references: [id])
+  departures TripDeparture[]
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([status, categoryId])
+}
+
+model TripDeparture {
+  id              String          @id @default(cuid())
+  tripId          String
+  startDate       DateTime
+  endDate         DateTime
+  priceInPaise    Int
+  totalSeats      Int
+  availableSeats  Int
+  status          DepartureStatus @default(OPEN)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+  @@index([startDate])
 }

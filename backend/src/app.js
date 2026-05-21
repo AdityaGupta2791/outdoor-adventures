@@ -6,6 +6,7 @@ import { env } from './config/env.js'
 import { requestLogger } from './middleware/requestLogger.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import { notFound } from './middleware/notFound.js'
+import tripsRouter from './modules/trips/trips.routes.js'
 
 const app = express()
 
@@ -28,9 +29,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// Module routes are mounted here as features are built:
+app.use('/api/trips', tripsRouter)
 // app.use('/api/auth', authRouter)
-// app.use('/api/trips', tripsRouter)
 // app.use('/api/bookings', bookingsRouter)
 // app.use('/api/payments', paymentsRouter)
 // app.use('/api/llm', llmRouter)
