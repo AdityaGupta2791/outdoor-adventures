@@ -15,17 +15,17 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
 
       <div className="relative z-10 text-center px-6 max-w-4xl">
-        <h1 className="font-display font-semibold text-white leading-[1.05] text-5xl sm:text-6xl md:text-7xl">
+        <h1 className="font-display font-semibold text-white leading-[1.05] text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
           Curated adventures
           <br />
           across India.
         </h1>
-        <p className="mt-7 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+        <p className="mt-6 sm:mt-7 text-sm sm:text-base md:text-lg lg:text-xl text-white/90 max-w-2xl mx-auto">
           Hand-picked treks, camps and hikes — with certified guides, honest difficulty ratings,
           and transparent pricing.
         </p>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-3">
           <Button to="/trips" variant="primary" size="lg">
             <Compass className="w-4 h-4" />
             Browse Trips

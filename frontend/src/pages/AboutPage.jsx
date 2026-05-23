@@ -39,7 +39,7 @@ function AboutPage() {
             size="lg"
           />
 
-          <section className="mt-16 grid grid-cols-3 gap-4 sm:gap-8 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm py-8 px-4 sm:px-8">
+          <section className="mt-16 grid grid-cols-3 gap-2 sm:gap-8 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm py-6 sm:py-8 px-3 sm:px-8">
             {stats.map((s, i) => (
               <div
                 key={s.label}
@@ -47,10 +47,12 @@ function AboutPage() {
                   i < stats.length - 1 ? 'border-r border-gray-200' : ''
                 }`}
               >
-                <div className="font-display text-3xl sm:text-4xl font-semibold text-brand-primary tracking-tight">
+                <div className="font-display text-xl sm:text-3xl md:text-4xl font-semibold text-brand-primary tracking-tight">
                   {s.value}
                 </div>
-                <div className="mt-1 text-xs sm:text-sm text-brand-muted">{s.label}</div>
+                <div className="mt-1 text-[10px] sm:text-sm text-brand-muted leading-tight">
+                  {s.label}
+                </div>
               </div>
             ))}
           </section>

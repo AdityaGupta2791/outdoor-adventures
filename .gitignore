@@ -36,3 +36,6 @@ coverage/
 # Local-only folders (not pushed to remote)
 docs/
 legacy/
+
+# Claude Code — personal local overrides (settings.json stays shared if added later)
+.claude/settings.local.json

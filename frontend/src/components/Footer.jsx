@@ -59,8 +59,8 @@ function Footer() {
   return (
     <footer className="bg-brand-primary-dark text-white">
       <div className="px-6">
-        <div className="max-w-7xl mx-auto py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="max-w-7xl mx-auto py-10 sm:py-14">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
             <div className="col-span-2 md:col-span-1">
               <Link to="/" className="inline-flex items-center gap-2 text-white">
                 <Mountain className="w-6 h-6" strokeWidth={2.25} />

@@ -42,14 +42,14 @@ function TripDetailPage() {
             <div className="relative aspect-[16/9] rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5">
               <img src={trip.coverImage} alt={trip.title} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white">
-                <span className="inline-block px-3 py-1 rounded-full bg-white/95 text-xs font-medium text-brand-primary mb-3">
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 text-white">
+                <span className="inline-block px-3 py-1 rounded-full bg-white/95 text-xs font-medium text-brand-primary mb-2 sm:mb-3">
                   {trip.category.name}
                 </span>
-                <h1 className="font-display text-4xl sm:text-5xl font-semibold leading-tight">
+                <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
                   {trip.title}
                 </h1>
-                <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-white/95">
+                <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-1 text-xs sm:text-sm text-white/95">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5" />
                     {trip.location}
@@ -217,22 +217,24 @@ function TripDetailPage() {
 }
 
 function Breadcrumbs({ trip }) {
-  const item = 'inline-flex items-center text-brand-muted hover:text-brand-text transition-colors'
-  const sep = 'mx-1 w-3.5 h-3.5 text-brand-muted/60'
+  const item = 'inline-flex items-center text-brand-muted hover:text-brand-text transition-colors shrink-0'
+  const sep = 'mx-1 w-3.5 h-3.5 text-brand-muted/60 shrink-0'
   return (
-    <nav aria-label="Breadcrumb" className="mb-6 flex items-center text-sm flex-wrap gap-y-1">
+    <nav
+      aria-label="Breadcrumb"
+      className="mb-6 flex items-center text-xs sm:text-sm flex-wrap gap-y-1"
+    >
       <Link to="/trips" className={item}>
         Trips
       </Link>
       <ChevronRight className={sep} />
-      <Link
-        to={`/trips?category=${trip.category.slug}`}
-        className={item}
-      >
+      <Link to={`/trips?category=${trip.category.slug}`} className={item}>
         {trip.category.name}
       </Link>
       <ChevronRight className={sep} />
-      <span className="text-brand-text font-medium truncate max-w-[16rem]">{trip.title}</span>
+      <span className="text-brand-text font-medium truncate max-w-[10rem] sm:max-w-[16rem] md:max-w-none">
+        {trip.title}
+      </span>
     </nav>
   )
 }

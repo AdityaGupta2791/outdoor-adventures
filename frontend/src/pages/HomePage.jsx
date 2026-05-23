@@ -58,7 +58,7 @@ function FeaturedTrips() {
   const { data, isLoading } = useTrips({ page: 1, limit: 6 })
 
   return (
-    <section id="featured" className="py-20 px-6 bg-brand-cream">
+    <section id="featured" className="py-14 sm:py-20 px-6 bg-brand-cream">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           eyebrow="Featured"
@@ -85,7 +85,7 @@ function BrowseByCategory() {
   const { data: categories, isLoading } = useCategories()
 
   return (
-    <section className="py-20 px-6 bg-white">
+    <section className="py-14 sm:py-20 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           eyebrow="Categories"
@@ -144,7 +144,7 @@ function BrowseByCategory() {
 
 function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-20 px-6 bg-brand-cream">
+    <section id="how-it-works" className="py-14 sm:py-20 px-6 bg-brand-cream">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           eyebrow="How it works"

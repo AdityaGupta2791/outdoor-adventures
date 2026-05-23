@@ -36,10 +36,10 @@ function TripCard({ trip }) {
       </div>
 
       <div className="flex flex-col flex-1 p-5">
-        <h3 className="font-display text-xl font-semibold text-brand-text leading-tight line-clamp-2 min-h-[3.25rem]">
+        <h3 className="font-display text-xl font-semibold text-brand-text leading-tight line-clamp-2 sm:min-h-[3.25rem]">
           {trip.title}
         </h3>
-        <p className="mt-2 text-sm text-brand-muted line-clamp-2 min-h-[2.5rem]">
+        <p className="mt-2 text-sm text-brand-muted line-clamp-2 sm:min-h-[2.5rem]">
           {trip.shortDescription}
         </p>
 

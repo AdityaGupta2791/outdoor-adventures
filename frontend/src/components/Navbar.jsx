@@ -18,6 +18,16 @@ function Navbar() {
     setMobileOpen(false)
   }, [location.pathname])
 
+  useEffect(() => {
+    if (mobileOpen) {
+      const original = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = original
+      }
+    }
+  }, [mobileOpen])
+
   const linkClass = ({ isActive }) => {
     const base =
       'relative px-3 py-2 text-sm font-medium transition-colors after:absolute after:left-3 after:right-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:transition-colors'
@@ -65,7 +75,7 @@ function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-black/5 shadow-lg px-6">
+        <div className="md:hidden bg-white border-t border-black/5 shadow-lg px-6 animate-slide-down">
           <nav className="max-w-7xl mx-auto py-3 flex flex-col gap-1">
             {links.map((link) => (
               <NavLink

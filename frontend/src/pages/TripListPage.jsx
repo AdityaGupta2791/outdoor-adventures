@@ -197,7 +197,7 @@ function Pagination({ page, totalPages, onChange }) {
       >
         Previous
       </Button>
-      <span className="px-4 text-sm text-brand-muted">
+      <span className="px-2 sm:px-4 text-xs sm:text-sm text-brand-muted whitespace-nowrap">
         Page {page} of {totalPages}
       </span>
       <Button
