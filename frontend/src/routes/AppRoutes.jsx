@@ -5,6 +5,8 @@ import ScrollToTop from '../components/ScrollToTop'
 import HomePage from '../pages/HomePage'
 import TripListPage from '../pages/TripListPage'
 import TripDetailPage from '../pages/TripDetailPage'
+import BookingPage from '../pages/BookingPage'
+import BookingConfirmationPage from '../pages/BookingConfirmationPage'
 import AboutPage from '../pages/AboutPage'
 import ContactPage from '../pages/ContactPage'
 
@@ -29,6 +31,8 @@ function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/trips" element={<TripListPage />} />
           <Route path="/trips/:slug" element={<TripDetailPage />} />
+          <Route path="/trips/:slug/book" element={<BookingPage />} />
+          <Route path="/bookings/:id" element={<BookingConfirmationPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<NotFoundPage />} />

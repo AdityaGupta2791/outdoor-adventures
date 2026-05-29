@@ -193,6 +193,7 @@ function TripDetailPage() {
                           </div>
                         </div>
                         <Button
+                          to={soldOut ? undefined : `/trips/${trip.slug}/book?departureId=${d.id}`}
                           variant="primary"
                           size="md"
                           fullWidth

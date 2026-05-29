@@ -29,6 +29,19 @@ enum DepartureStatus {
   COMPLETED
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
 model TripCategory {
   id           String   @id @default(cuid())
   name         String
@@ -84,8 +97,51 @@ model TripDeparture {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip     Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  bookings Booking[]
 
   @@index([tripId])
   @@index([startDate])
+}
+
+model Booking {
+  id                 String        @id @default(cuid())
+  bookingRef         String        @unique
+  departureId        String
+  userId             String?
+  guestName          String
+  guestEmail         String
+  guestPhone         String
+  seatCount          Int
+  totalAmountInPaise Int
+  status             BookingStatus @default(PENDING)
+  notes              String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  departure TripDeparture @relation(fields: [departureId], references: [id])
+  payment   Payment?
+
+  @@index([bookingRef])
+  @@index([guestEmail])
+  @@index([departureId])
+  @@index([status])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  bookingId         String        @unique
+  razorpayOrderId   String        @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amountInPaise     Int
+  currency          String        @default("INR")
+  status            PaymentStatus @default(CREATED)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@index([razorpayOrderId])
+  @@index([status])
 }
