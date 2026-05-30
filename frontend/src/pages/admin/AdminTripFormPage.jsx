@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, Plus, Trash2, Save, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Save, ExternalLink, Sparkles, Loader2 } from 'lucide-react'
 import Button from '../../components/Button'
 import {
   useAdminTrip,
@@ -14,6 +14,7 @@ import {
   useAdminUpdateDeparture,
   useAdminDeleteDeparture,
 } from '../../features/admin/admin.hooks'
+import { useLLMStatus, useGenerateTripCopy } from '../../features/llm/llm.hooks'
 import { formatINR, formatDateRange } from '../../lib/format'
 
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -99,6 +100,49 @@ function AdminTripFormPage() {
   const [serverError, setServerError] = useState(null)
   const titleVal = watch('title')
   const slugVal = watch('slug')
+
+  // AI trip-copy generation
+  const { data: llmStatus } = useLLMStatus()
+  const generateCopy = useGenerateTripCopy()
+  const [aiBanner, setAiBanner] = useState(null) // { type: 'success' | 'error', message }
+  const aiInputs = watch(['title', 'location', 'categoryId', 'difficulty', 'durationDays'])
+  const [aiTitle, aiLocation, aiCategoryId, aiDifficulty, aiDurationDays] = aiInputs
+  const aiReady =
+    aiTitle?.trim().length >= 3 &&
+    aiLocation?.trim().length >= 2 &&
+    aiCategoryId &&
+    aiDifficulty &&
+    Number(aiDurationDays) > 0
+
+  const handleGenerateCopy = async () => {
+    if (!aiReady || generateCopy.isPending) return
+    setAiBanner(null)
+    const categoryName =
+      categories?.find((c) => c.id === aiCategoryId)?.name?.toLowerCase() ?? 'adventure'
+    try {
+      const copy = await generateCopy.mutateAsync({
+        title: aiTitle.trim(),
+        location: aiLocation.trim(),
+        category: categoryName,
+        difficulty: aiDifficulty,
+        durationDays: Number(aiDurationDays),
+      })
+      setValue('shortDescription', copy.shortDescription, { shouldValidate: true, shouldDirty: true })
+      setValue('description', copy.description, { shouldValidate: true, shouldDirty: true })
+      itinerary.replace(copy.itinerary)
+      inclusions.replace(copy.inclusions.map((value) => ({ value })))
+      exclusions.replace(copy.exclusions.map((value) => ({ value })))
+      setAiBanner({
+        type: 'success',
+        message: 'Generated. Review and edit anything before saving.',
+      })
+    } catch (err) {
+      setAiBanner({
+        type: 'error',
+        message: err?.response?.data?.error?.message || 'AI generation failed. Try again.',
+      })
+    }
+  }
 
   // Auto-slug from title on create
   useEffect(() => {
@@ -248,6 +292,14 @@ function AdminTripFormPage() {
               />
             </Field>
           </Grid>
+          {llmStatus?.configured && (
+            <AIGenerateCard
+              ready={aiReady}
+              pending={generateCopy.isPending}
+              banner={aiBanner}
+              onGenerate={handleGenerateCopy}
+            />
+          )}
           <Field
             label="Short description"
             error={errors.shortDescription?.message}
@@ -538,6 +590,57 @@ function DeparturesManager({ tripId, departures }) {
         </div>
       </div>
     </section>
+  )
+}
+
+function AIGenerateCard({ ready, pending, banner, onGenerate }) {
+  return (
+    <div className="rounded-xl bg-gradient-to-br from-brand-primary/5 to-brand-accent/5 ring-1 ring-brand-primary/15 p-4">
+      <div className="flex items-start gap-3">
+        <span className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary">
+          <Sparkles className="w-4 h-4" />
+        </span>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-brand-text text-sm">
+            Generate description with AI
+          </h3>
+          <p className="text-xs text-brand-muted mt-0.5">
+            {ready
+              ? 'Fills the short copy, full description, itinerary, and inclusions/exclusions. You can edit anything afterwards.'
+              : 'Fill the title, location, category, difficulty, and duration first.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onGenerate}
+          disabled={!ready || pending}
+          className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-semibold shadow-sm hover:bg-brand-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {pending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Generating…
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              Generate
+            </>
+          )}
+        </button>
+      </div>
+      {banner && (
+        <div
+          className={`mt-3 p-2.5 rounded-lg text-xs ${
+            banner.type === 'success'
+              ? 'bg-green-50 border border-green-200 text-green-800'
+              : 'bg-red-50 border border-red-200 text-red-700'
+          }`}
+        >
+          {banner.message}
+        </div>
+      )}
+    </div>
   )
 }
 

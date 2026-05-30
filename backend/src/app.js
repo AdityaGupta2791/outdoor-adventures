@@ -13,6 +13,7 @@ import tripsRouter from './modules/trips/trips.routes.js'
 import bookingsRouter from './modules/bookings/bookings.routes.js'
 import paymentsRouter from './modules/payments/payments.routes.js'
 import adminRouter from './modules/admin/admin.routes.js'
+import llmRouter from './modules/llm/llm.routes.js'
 
 const app = express()
 
@@ -49,7 +50,7 @@ app.use('/api/trips', tripsRouter)
 app.use('/api/bookings', bookingsRouter)
 app.use('/api/payments', paymentsRouter)
 app.use('/api/admin', adminRouter)
-// app.use('/api/llm', llmRouter)
+app.use('/api/llm', llmRouter)
 
 app.use(notFound)
 app.use(errorHandler)

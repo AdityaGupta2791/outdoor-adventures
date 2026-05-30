@@ -6,6 +6,8 @@ export const tripListQuerySchema = z.object({
   search: z.string().trim().min(1).max(100).optional(),
   minPrice: z.coerce.number().int().nonnegative().optional(),
   maxPrice: z.coerce.number().int().nonnegative().optional(),
+  minDurationDays: z.coerce.number().int().positive().optional(),
+  maxDurationDays: z.coerce.number().int().positive().optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(12),
 })

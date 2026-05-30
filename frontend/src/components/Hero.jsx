@@ -1,7 +1,11 @@
-import { Compass, ChevronDown } from 'lucide-react'
+import { Compass, ChevronDown, Sparkles } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import Button from './Button'
+import { useLLMStatus } from '../features/llm/llm.hooks'
 
 function Hero() {
+  const { data: llmStatus } = useLLMStatus()
+
   return (
     <section
       id="home"
@@ -34,6 +38,23 @@ function Hero() {
             How it works
           </Button>
         </div>
+
+        {llmStatus?.configured && (
+          <div className="mt-5 flex justify-center">
+            <Link
+              to="/trips?ai=1"
+              className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm ring-1 ring-white/20 text-white/90 text-sm hover:bg-white/15 hover:ring-white/30 transition-all"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />
+              <span>
+                Try AI search —{' '}
+                <span className="text-white/70 italic">
+                  "weekend trek for beginners under ₹10k"
+                </span>
+              </span>
+            </Link>
+          </div>
+        )}
       </div>
 
       <a

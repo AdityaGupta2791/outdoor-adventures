@@ -28,7 +28,17 @@ const tripCardSelect = {
   },
 }
 
-export async function listTrips({ category, difficulty, search, minPrice, maxPrice, page, limit }) {
+export async function listTrips({
+  category,
+  difficulty,
+  search,
+  minPrice,
+  maxPrice,
+  minDurationDays,
+  maxDurationDays,
+  page,
+  limit,
+}) {
   const where = { status: 'PUBLISHED' }
 
   if (category) where.category = { slug: category }
@@ -37,6 +47,11 @@ export async function listTrips({ category, difficulty, search, minPrice, maxPri
     where.basePriceInPaise = {}
     if (minPrice !== undefined) where.basePriceInPaise.gte = minPrice * 100
     if (maxPrice !== undefined) where.basePriceInPaise.lte = maxPrice * 100
+  }
+  if (minDurationDays !== undefined || maxDurationDays !== undefined) {
+    where.durationDays = {}
+    if (minDurationDays !== undefined) where.durationDays.gte = minDurationDays
+    if (maxDurationDays !== undefined) where.durationDays.lte = maxDurationDays
   }
   if (search) {
     where.OR = [

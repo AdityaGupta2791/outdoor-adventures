@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, X, SearchX } from 'lucide-react'
+import { Search, X, SearchX, Sparkles } from 'lucide-react'
 import { useTrips, useCategories } from '../features/trips/trips.hooks'
+import { useLLMStatus, useNLSearch } from '../features/llm/llm.hooks'
 import { useDebounce } from '../hooks/useDebounce'
 import TripCard from '../components/TripCard'
 import { TripCardSkeletonGrid } from '../components/TripCardSkeleton'
 import SectionHeader from '../components/SectionHeader'
 import Button from '../components/Button'
+import AISearchBar from '../components/AISearchBar'
 
 const difficulties = [
   { value: '', label: 'All levels' },
@@ -26,6 +28,28 @@ function TripListPage() {
 
   const [searchInput, setSearchInput] = useState(searchParam)
   const debouncedSearch = useDebounce(searchInput, 300)
+
+  // AI search state
+  const aiInputRef = useRef(null)
+  const [aiQuery, setAiQuery] = useState('')
+  const [aiResult, setAiResult] = useState(null)
+  const { data: llmStatus } = useLLMStatus()
+  const aiSearchMutation = useNLSearch()
+  const aiError = aiSearchMutation.error
+    ? aiSearchMutation.error?.response?.data?.error?.message ||
+      'AI search failed. Please try again.'
+    : null
+
+  // Focus AI bar when arriving via ?ai=1
+  useEffect(() => {
+    if (searchParams.get('ai') === '1' && aiInputRef.current && llmStatus?.configured) {
+      aiInputRef.current.focus()
+      // strip the marker so refreshing doesn't re-focus
+      const next = new URLSearchParams(searchParams)
+      next.delete('ai')
+      setSearchParams(next, { replace: true })
+    }
+  }, [llmStatus?.configured])
 
   useEffect(() => {
     if (debouncedSearch === searchParam) return
@@ -64,7 +88,24 @@ function TripListPage() {
     setSearchParams({})
   }
 
+  const handleAISubmit = async (q) => {
+    aiSearchMutation.reset()
+    try {
+      const res = await aiSearchMutation.mutateAsync(q)
+      setAiResult(res)
+    } catch {
+      setAiResult(null)
+    }
+  }
+
+  const handleAIClear = () => {
+    setAiResult(null)
+    setAiQuery('')
+    aiSearchMutation.reset()
+  }
+
   const hasFilters = Boolean(category || difficulty || debouncedSearch)
+  const inAIMode = Boolean(aiResult)
 
   return (
     <div className="min-h-screen pt-28 pb-20 px-6 bg-brand-cream">
@@ -77,88 +118,147 @@ function TripListPage() {
           className="mb-10"
         />
 
-        <div className="mb-8 p-4 bg-white rounded-2xl shadow-sm ring-1 ring-black/5">
-          <div className="flex flex-col lg:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted pointer-events-none" />
-              <input
-                type="search"
-                placeholder="Search trips by name or location..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-sm transition-colors"
-              />
+        {llmStatus?.configured && (
+          <div className="mb-6">
+            <AISearchBar
+              ref={aiInputRef}
+              value={aiQuery}
+              onChange={setAiQuery}
+              onSubmit={handleAISubmit}
+              onClear={handleAIClear}
+              result={aiResult}
+              isPending={aiSearchMutation.isPending}
+              error={aiError}
+            />
+          </div>
+        )}
+
+        {!inAIMode && (
+          <div className="mb-8 p-4 bg-white rounded-2xl shadow-sm ring-1 ring-black/5">
+            <div className="flex flex-col lg:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted pointer-events-none" />
+                <input
+                  type="search"
+                  placeholder="Search trips by name or location..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-sm transition-colors"
+                />
+              </div>
+
+              <select
+                value={category}
+                onChange={(e) => updateParam('category', e.target.value)}
+                className="px-4 py-2.5 rounded-lg bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-sm transition-colors"
+              >
+                <option value="">All categories</option>
+                {categories?.map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.name} ({c._count.trips})
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={difficulty}
+                onChange={(e) => updateParam('difficulty', e.target.value)}
+                className="px-4 py-2.5 rounded-lg bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-sm transition-colors"
+              >
+                {difficulties.map((d) => (
+                  <option key={d.value} value={d.value}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
+
+              {hasFilters && (
+                <Button variant="ghost" size="md" onClick={clearAll}>
+                  <X className="w-4 h-4" />
+                  Clear
+                </Button>
+              )}
             </div>
-
-            <select
-              value={category}
-              onChange={(e) => updateParam('category', e.target.value)}
-              className="px-4 py-2.5 rounded-lg bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-sm transition-colors"
-            >
-              <option value="">All categories</option>
-              {categories?.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name} ({c._count.trips})
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={difficulty}
-              onChange={(e) => updateParam('difficulty', e.target.value)}
-              className="px-4 py-2.5 rounded-lg bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-sm transition-colors"
-            >
-              {difficulties.map((d) => (
-                <option key={d.value} value={d.value}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-
-            {hasFilters && (
-              <Button variant="ghost" size="md" onClick={clearAll}>
-                <X className="w-4 h-4" />
-                Clear
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {isLoading && <TripCardSkeletonGrid count={6} />}
-
-        {isError && (
-          <div className="text-center py-16 text-red-600">
-            Something went wrong loading trips. Please refresh.
           </div>
         )}
 
-        {data && data.trips.length === 0 && (
-          <EmptyState hasFilters={hasFilters} onClear={clearAll} />
-        )}
-
-        {data && data.trips.length > 0 && (
+        {inAIMode ? (
+          <AIResults result={aiResult} />
+        ) : (
           <>
-            <div className="mb-4 text-sm text-brand-muted">
-              Showing {data.trips.length} of {data.pagination.total} trips
-              {isFetching && <span className="ml-2 opacity-60">updating...</span>}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {data.trips.map((trip) => (
-                <TripCard key={trip.id} trip={trip} />
-              ))}
-            </div>
+            {isLoading && <TripCardSkeletonGrid count={6} />}
 
-            {data.pagination.totalPages > 1 && (
-              <Pagination
-                page={page}
-                totalPages={data.pagination.totalPages}
-                onChange={(p) => updateParam('page', String(p))}
-              />
+            {isError && (
+              <div className="text-center py-16 text-red-600">
+                Something went wrong loading trips. Please refresh.
+              </div>
+            )}
+
+            {data && data.trips.length === 0 && (
+              <EmptyState hasFilters={hasFilters} onClear={clearAll} />
+            )}
+
+            {data && data.trips.length > 0 && (
+              <>
+                <div className="mb-4 text-sm text-brand-muted">
+                  Showing {data.trips.length} of {data.pagination.total} trips
+                  {isFetching && <span className="ml-2 opacity-60">updating...</span>}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {data.trips.map((trip) => (
+                    <TripCard key={trip.id} trip={trip} />
+                  ))}
+                </div>
+
+                {data.pagination.totalPages > 1 && (
+                  <Pagination
+                    page={page}
+                    totalPages={data.pagination.totalPages}
+                    onChange={(p) => updateParam('page', String(p))}
+                  />
+                )}
+              </>
             )}
           </>
         )}
       </div>
     </div>
+  )
+}
+
+function AIResults({ result }) {
+  if (!result) return null
+  const trips = result.trips ?? []
+  const total = result.pagination?.total ?? trips.length
+
+  if (trips.length === 0) {
+    return (
+      <div className="text-center py-20 px-6 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-primary/10 text-brand-primary mb-5">
+          <Sparkles className="w-7 h-7" />
+        </div>
+        <h2 className="font-display text-2xl sm:text-3xl font-semibold text-brand-text">
+          No trips match this search
+        </h2>
+        <p className="mt-2 text-brand-muted max-w-md mx-auto">
+          Try rephrasing — broaden the budget, change the difficulty, or skip a specific
+          location.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="mb-4 text-sm text-brand-muted">
+        Found {total} trip{total === 1 ? '' : 's'} from your description
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {trips.map((trip) => (
+          <TripCard key={trip.id} trip={trip} />
+        ))}
+      </div>
+    </>
   )
 }
 
