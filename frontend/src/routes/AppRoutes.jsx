@@ -2,6 +2,9 @@ import { Routes, Route } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ScrollToTop from '../components/ScrollToTop'
+import ProtectedRoute from '../components/auth/ProtectedRoute'
+import GuestOnlyRoute from '../components/auth/GuestOnlyRoute'
+import { useSessionRestore } from '../features/auth/auth.hooks'
 import HomePage from '../pages/HomePage'
 import TripListPage from '../pages/TripListPage'
 import TripDetailPage from '../pages/TripDetailPage'
@@ -9,6 +12,10 @@ import BookingPage from '../pages/BookingPage'
 import BookingConfirmationPage from '../pages/BookingConfirmationPage'
 import AboutPage from '../pages/AboutPage'
 import ContactPage from '../pages/ContactPage'
+import LoginPage from '../pages/LoginPage'
+import SignupPage from '../pages/SignupPage'
+import AuthCallbackPage from '../pages/AuthCallbackPage'
+import DashboardPage from '../pages/DashboardPage'
 
 function NotFoundPage() {
   return (
@@ -22,6 +29,8 @@ function NotFoundPage() {
 }
 
 function AppRoutes() {
+  useSessionRestore()
+
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
@@ -35,6 +44,31 @@ function AppRoutes() {
           <Route path="/bookings/:id" element={<BookingConfirmationPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route
+            path="/login"
+            element={
+              <GuestOnlyRoute>
+                <LoginPage />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <GuestOnlyRoute>
+                <SignupPage />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

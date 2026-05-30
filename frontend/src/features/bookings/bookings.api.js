@@ -9,3 +9,8 @@ export async function fetchBookingById(id) {
   const { data } = await api.get(`/bookings/${id}`)
   return data.booking
 }
+
+export async function fetchMyBookings() {
+  const { data } = await api.get('/bookings/me')
+  return data.bookings
+}

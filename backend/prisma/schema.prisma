@@ -42,6 +42,41 @@ enum PaymentStatus {
   FAILED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String?
+  name          String
+  role          UserRole @default(USER)
+  emailVerified Boolean  @default(false)
+  avatarUrl     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  accounts Account[]
+  bookings Booking[]
+
+  @@index([email])
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
 model TripCategory {
   id           String   @id @default(cuid())
   name         String
@@ -121,11 +156,13 @@ model Booking {
 
   departure TripDeparture @relation(fields: [departureId], references: [id])
   payment   Payment?
+  user      User?         @relation(fields: [userId], references: [id])
 
   @@index([bookingRef])
   @@index([guestEmail])
   @@index([departureId])
   @@index([status])
+  @@index([userId])
 }
 
 model Payment {

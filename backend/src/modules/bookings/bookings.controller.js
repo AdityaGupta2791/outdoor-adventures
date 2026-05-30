@@ -9,12 +9,27 @@ export async function createBooking(req, res, next) {
         error: { message: 'Invalid booking details', issues: parsed.error.flatten() },
       })
     }
-    const booking = await bookingsService.createBooking(parsed.data)
+    const booking = await bookingsService.createBooking({
+      ...parsed.data,
+      userId: req.user?.id ?? null,
+    })
     res.status(201).json({ booking })
   } catch (err) {
     if (err instanceof bookingsService.BookingError) {
       return res.status(err.status).json({ error: { message: err.message } })
     }
+    next(err)
+  }
+}
+
+export async function listMyBookings(req, res, next) {
+  try {
+    const bookings = await bookingsService.listBookingsForUser({
+      userId: req.user.id,
+      email: req.user.email,
+    })
+    res.json({ bookings })
+  } catch (err) {
     next(err)
   }
 }

@@ -23,6 +23,7 @@ export async function createBooking({
   guestEmail,
   guestPhone,
   seatCount,
+  userId = null,
 }) {
   return prisma.$transaction(async (tx) => {
     const departure = await tx.tripDeparture.findUnique({
@@ -77,6 +78,7 @@ export async function createBooking({
       data: {
         bookingRef,
         departureId,
+        userId,
         guestName,
         guestEmail,
         guestPhone,
@@ -102,6 +104,24 @@ export async function createBooking({
 export async function getBookingById(id) {
   return prisma.booking.findUnique({
     where: { id },
+    include: {
+      departure: {
+        include: {
+          trip: {
+            select: { id: true, slug: true, title: true, coverImage: true, location: true },
+          },
+        },
+      },
+    },
+  })
+}
+
+export async function listBookingsForUser({ userId, email }) {
+  return prisma.booking.findMany({
+    where: {
+      OR: [{ userId }, { guestEmail: email }],
+    },
+    orderBy: { createdAt: 'desc' },
     include: {
       departure: {
         include: {

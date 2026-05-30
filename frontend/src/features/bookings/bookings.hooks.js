@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createBooking, fetchBookingById } from './bookings.api'
+import { createBooking, fetchBookingById, fetchMyBookings } from './bookings.api'
+
+export function useMyBookings() {
+  return useQuery({
+    queryKey: ['my-bookings'],
+    queryFn: fetchMyBookings,
+  })
+}
 
 export function useCreateBooking() {
   const qc = useQueryClient()

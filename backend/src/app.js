@@ -2,10 +2,13 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
+import cookieParser from 'cookie-parser'
 import { env } from './config/env.js'
+import { passport } from './config/passport.js'
 import { requestLogger } from './middleware/requestLogger.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import { notFound } from './middleware/notFound.js'
+import authRouter from './modules/auth/auth.routes.js'
 import tripsRouter from './modules/trips/trips.routes.js'
 import bookingsRouter from './modules/bookings/bookings.routes.js'
 import paymentsRouter from './modules/payments/payments.routes.js'
@@ -23,6 +26,8 @@ app.use(
   })
 )
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
+app.use(passport.initialize())
 app.use(requestLogger)
 
 app.use(
@@ -38,10 +43,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+app.use('/api/auth', authRouter)
 app.use('/api/trips', tripsRouter)
 app.use('/api/bookings', bookingsRouter)
 app.use('/api/payments', paymentsRouter)
-// app.use('/api/auth', authRouter)
 // app.use('/api/llm', llmRouter)
 
 app.use(notFound)
