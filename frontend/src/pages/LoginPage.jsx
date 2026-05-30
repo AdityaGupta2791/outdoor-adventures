@@ -17,7 +17,6 @@ function LoginPage() {
   const location = useLocation()
   const { login, isPending, error, clearError } = useLogin()
   const providers = useProviders()
-  const redirectTo = location.state?.from ?? '/dashboard'
 
   const {
     register,
@@ -28,8 +27,10 @@ function LoginPage() {
   const onSubmit = async (values) => {
     clearError()
     try {
-      await login(values)
-      navigate(redirectTo, { replace: true })
+      const user = await login(values)
+      const dest =
+        location.state?.from ?? (user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard')
+      navigate(dest, { replace: true })
     } catch {
       /* error surfaced via hook */
     }

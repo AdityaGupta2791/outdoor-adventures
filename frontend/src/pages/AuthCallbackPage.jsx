@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../features/auth/auth.hooks'
 
 function AuthCallbackPage() {
-  const { status } = useAuth()
+  const { status, user } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
     if (status === 'authenticated') {
-      navigate('/dashboard', { replace: true })
+      navigate(user?.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard', { replace: true })
     } else if (status === 'unauthenticated') {
       navigate('/login?error=oauth', { replace: true })
     }
-  }, [status, navigate])
+  }, [status, user, navigate])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-brand-cream gap-4">

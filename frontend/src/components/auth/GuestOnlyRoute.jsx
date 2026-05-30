@@ -4,12 +4,13 @@ import FullPageLoader from '../FullPageLoader'
 
 // Blocks authenticated users from auth-only pages (login/signup).
 function GuestOnlyRoute({ children }) {
-  const { status } = useAuth()
+  const { status, user } = useAuth()
   const location = useLocation()
 
   if (status === 'loading') return <FullPageLoader />
   if (status === 'authenticated') {
-    const dest = location.state?.from ?? '/dashboard'
+    const dest =
+      location.state?.from ?? (user?.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard')
     return <Navigate to={dest} replace />
   }
   return children

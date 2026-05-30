@@ -18,7 +18,6 @@ function SignupPage() {
   const location = useLocation()
   const { register: registerUser, isPending, error, clearError } = useRegister()
   const providers = useProviders()
-  const redirectTo = location.state?.from ?? '/dashboard'
 
   const {
     register,
@@ -29,8 +28,10 @@ function SignupPage() {
   const onSubmit = async (values) => {
     clearError()
     try {
-      await registerUser(values)
-      navigate(redirectTo, { replace: true })
+      const user = await registerUser(values)
+      const dest =
+        location.state?.from ?? (user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard')
+      navigate(dest, { replace: true })
     } catch {
       /* error surfaced via hook */
     }
