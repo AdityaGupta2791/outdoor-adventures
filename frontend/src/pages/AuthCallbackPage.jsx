@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../features/auth/auth.hooks'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 function AuthCallbackPage() {
+  useDocumentTitle('Signing you in…')
   const { status, user } = useAuth()
   const navigate = useNavigate()
 

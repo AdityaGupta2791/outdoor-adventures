@@ -8,8 +8,10 @@ import {
 } from '../../features/admin/admin.hooks'
 import { useAuth } from '../../features/auth/auth.hooks'
 import { useDebounce } from '../../hooks/useDebounce'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 
 function AdminUsersPage() {
+  useDocumentTitle('Admin · Users')
   const { user: currentUser } = useAuth()
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebounce(searchInput, 300)

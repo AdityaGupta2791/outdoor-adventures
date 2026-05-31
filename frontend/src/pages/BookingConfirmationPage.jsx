@@ -16,11 +16,13 @@ import Button from '../components/Button'
 import { useBooking } from '../features/bookings/bookings.hooks'
 import { useRazorpayCheckout } from '../features/bookings/payments.hooks'
 import { formatINR, formatDateRange } from '../lib/format'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 function BookingConfirmationPage() {
   const { id } = useParams()
   const { data: booking, isLoading, isError } = useBooking(id)
   const { startCheckout, isProcessing, error, clearError } = useRazorpayCheckout()
+  useDocumentTitle(booking ? `Booking ${booking.bookingRef}` : 'Booking')
 
   if (isLoading) return <ConfirmationSkeleton />
 

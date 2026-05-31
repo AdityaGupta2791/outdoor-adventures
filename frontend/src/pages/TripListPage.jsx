@@ -4,6 +4,7 @@ import { Search, X, SearchX, Sparkles } from 'lucide-react'
 import { useTrips, useCategories } from '../features/trips/trips.hooks'
 import { useLLMStatus, useNLSearch } from '../features/llm/llm.hooks'
 import { useDebounce } from '../hooks/useDebounce'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import TripCard from '../components/TripCard'
 import { TripCardSkeletonGrid } from '../components/TripCardSkeleton'
 import SectionHeader from '../components/SectionHeader'
@@ -19,6 +20,7 @@ const difficulties = [
 ]
 
 function TripListPage() {
+  useDocumentTitle('Browse trips')
   const [searchParams, setSearchParams] = useSearchParams()
 
   const category = searchParams.get('category') ?? ''

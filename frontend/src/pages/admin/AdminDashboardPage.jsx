@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Map, CalendarCheck, Users, IndianRupee, TrendingUp } from 'lucide-react'
 import { useAdminStats } from '../../features/admin/admin.hooks'
 import { formatINR, formatDateRange } from '../../lib/format'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 
 const statusStyles = {
   PENDING: 'bg-yellow-100 text-yellow-800',
@@ -11,6 +12,7 @@ const statusStyles = {
 }
 
 function AdminDashboardPage() {
+  useDocumentTitle('Admin · Dashboard')
   const { data, isLoading, isError } = useAdminStats()
 
   if (isLoading) return <DashboardSkeleton />

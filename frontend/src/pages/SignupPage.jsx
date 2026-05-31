@@ -6,6 +6,7 @@ import AuthShell from '../components/auth/AuthShell'
 import GoogleButton from '../components/auth/GoogleButton'
 import Button from '../components/Button'
 import { useRegister, useProviders } from '../features/auth/auth.hooks'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Please enter your full name').max(100),
@@ -14,6 +15,7 @@ const schema = z.object({
 })
 
 function SignupPage() {
+  useDocumentTitle('Create account')
   const navigate = useNavigate()
   const location = useLocation()
   const { register: registerUser, isPending, error, clearError } = useRegister()

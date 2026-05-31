@@ -19,6 +19,7 @@ import { useCreateBooking } from '../features/bookings/bookings.hooks'
 import { useRazorpayCheckout } from '../features/bookings/payments.hooks'
 import { loadRazorpayScript } from '../features/bookings/payments.api'
 import { formatINR, formatDateRange, difficultyLabel } from '../lib/format'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const schema = z.object({
   guestName: z.string().trim().min(2, 'Please enter your full name').max(100),
@@ -37,6 +38,7 @@ function BookingPage() {
   const navigate = useNavigate()
 
   const { data: trip, isLoading } = useTrip(slug)
+  useDocumentTitle(trip ? `Book — ${trip.title}` : 'Book your trip')
   const createBooking = useCreateBooking()
   const { startCheckout, isProcessing, error: paymentError } = useRazorpayCheckout()
   const [pendingBooking, setPendingBooking] = useState(null)

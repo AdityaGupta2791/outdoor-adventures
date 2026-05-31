@@ -24,17 +24,7 @@ import AdminTripFormPage from '../pages/admin/AdminTripFormPage'
 import AdminBookingsListPage from '../pages/admin/AdminBookingsListPage'
 import AdminBookingDetailPage from '../pages/admin/AdminBookingDetailPage'
 import AdminUsersPage from '../pages/admin/AdminUsersPage'
-
-function NotFoundPage() {
-  return (
-    <div className="min-h-[70vh] flex items-center justify-center text-center px-6">
-      <div>
-        <h1 className="font-display text-5xl font-semibold">404</h1>
-        <p className="mt-3 text-brand-muted">This page doesn’t exist.</p>
-      </div>
-    </div>
-  )
-}
+import NotFoundPage from '../pages/NotFoundPage'
 
 function PublicLayout() {
   return (
@@ -72,6 +62,7 @@ function AppRoutes() {
           <Route path="bookings" element={<AdminBookingsListPage />} />
           <Route path="bookings/:id" element={<AdminBookingDetailPage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
 
         {/* Public + customer routes — public layout */}

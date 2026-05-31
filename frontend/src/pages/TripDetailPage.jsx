@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useTrip, useTrips } from '../features/trips/trips.hooks'
 import { formatINR, formatDateRange, difficultyLabel } from '../lib/format'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import TripCard from '../components/TripCard'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
@@ -18,6 +19,7 @@ import SectionHeader from '../components/SectionHeader'
 function TripDetailPage() {
   const { slug } = useParams()
   const { data: trip, isLoading, isError } = useTrip(slug)
+  useDocumentTitle(trip?.title)
 
   if (isLoading) return <DetailSkeleton />
 

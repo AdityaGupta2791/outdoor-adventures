@@ -8,6 +8,7 @@ import {
   useAdminCategories,
 } from '../../features/admin/admin.hooks'
 import { useDebounce } from '../../hooks/useDebounce'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { formatINR, difficultyLabel } from '../../lib/format'
 
 const statusStyles = {
@@ -17,6 +18,7 @@ const statusStyles = {
 }
 
 function AdminTripsListPage() {
+  useDocumentTitle('Admin · Trips')
   const [statusFilter, setStatusFilter] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [difficultyFilter, setDifficultyFilter] = useState('')

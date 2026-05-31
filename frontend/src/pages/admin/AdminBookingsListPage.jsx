@@ -8,6 +8,7 @@ import {
   useAdminUpdateBookingStatus,
 } from '../../features/admin/admin.hooks'
 import { useDebounce } from '../../hooks/useDebounce'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { formatINR, formatDateRange } from '../../lib/format'
 
 const statusStyles = {
@@ -35,6 +36,7 @@ const STATUS_LABEL = {
 const isTerminalStatus = (s) => s === 'CANCELLED' || s === 'REFUNDED'
 
 function AdminBookingsListPage() {
+  useDocumentTitle('Admin · Bookings')
   const navigate = useNavigate()
   const [statusFilter, setStatusFilter] = useState('')
   const [searchInput, setSearchInput] = useState('')

@@ -1,6 +1,7 @@
 import { Compass, Shield, Sparkles } from 'lucide-react'
 import CallToAction from '../components/CallToAction'
 import SectionHeader from '../components/SectionHeader'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const stats = [
   { value: '15+', label: 'Curated Trips' },
@@ -27,6 +28,7 @@ const values = [
 ]
 
 function AboutPage() {
+  useDocumentTitle('About')
   return (
     <>
       <div className="min-h-screen pt-28 pb-12 px-6 bg-brand-cream">

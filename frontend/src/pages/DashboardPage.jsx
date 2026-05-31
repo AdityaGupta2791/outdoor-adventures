@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import { useAuth } from '../features/auth/auth.hooks'
 import { useMyBookings } from '../features/bookings/bookings.hooks'
 import { formatINR, formatDateRange } from '../lib/format'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const statusStyles = {
   PENDING: 'bg-yellow-100 text-yellow-800',
@@ -21,6 +22,7 @@ const statusLabel = {
 }
 
 function DashboardPage() {
+  useDocumentTitle('My bookings')
   const { user } = useAuth()
   const { data: bookings, isLoading, isError } = useMyBookings()
 

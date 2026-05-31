@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Mail, Phone, MapPin, Send } from 'lucide-react'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const channels = [
   {
@@ -25,6 +26,7 @@ const channels = [
 ]
 
 function ContactPage() {
+  useDocumentTitle('Contact')
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
 
   const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))

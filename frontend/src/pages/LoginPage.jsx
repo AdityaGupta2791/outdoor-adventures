@@ -6,6 +6,7 @@ import AuthShell from '../components/auth/AuthShell'
 import GoogleButton from '../components/auth/GoogleButton'
 import Button from '../components/Button'
 import { useLogin, useProviders } from '../features/auth/auth.hooks'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const schema = z.object({
   email: z.string().trim().toLowerCase().email('Enter a valid email address'),
@@ -13,6 +14,7 @@ const schema = z.object({
 })
 
 function LoginPage() {
+  useDocumentTitle('Sign in')
   const navigate = useNavigate()
   const location = useLocation()
   const { login, isPending, error, clearError } = useLogin()

@@ -6,6 +6,7 @@ import CallToAction from '../components/CallToAction'
 import SectionHeader from '../components/SectionHeader'
 import { TripCardSkeletonGrid } from '../components/TripCardSkeleton'
 import { useTrips, useCategories } from '../features/trips/trips.hooks'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 const categoryIcons = {
   trekking: Mountain,
@@ -43,6 +44,7 @@ const seeAllLink = (
 )
 
 function HomePage() {
+  useDocumentTitle('Curated adventures across India')
   return (
     <>
       <Hero />

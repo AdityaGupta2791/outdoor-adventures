@@ -3,6 +3,7 @@ import { ArrowLeft, Mail, Phone, Calendar, Users, Ticket, MapPin, XCircle } from
 import { useState } from 'react'
 import Button from '../../components/Button'
 import { useAdminBooking, useAdminCancelBooking } from '../../features/admin/admin.hooks'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { formatINR, formatDateRange } from '../../lib/format'
 
 const statusStyles = {
@@ -15,6 +16,7 @@ const statusStyles = {
 function AdminBookingDetailPage() {
   const { id } = useParams()
   const { data: booking, isLoading, isError } = useAdminBooking(id)
+  useDocumentTitle(booking ? `Admin · ${booking.bookingRef}` : 'Admin · Booking')
   const cancel = useAdminCancelBooking()
   const [error, setError] = useState(null)
 

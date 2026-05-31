@@ -15,6 +15,7 @@ import {
   useAdminDeleteDeparture,
 } from '../../features/admin/admin.hooks'
 import { useLLMStatus, useGenerateTripCopy } from '../../features/llm/llm.hooks'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { formatINR, formatDateRange } from '../../lib/format'
 
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -76,6 +77,7 @@ function AdminTripFormPage() {
   const { id } = useParams()
   const isEdit = Boolean(id) && id !== 'new'
   const navigate = useNavigate()
+  useDocumentTitle(isEdit ? 'Admin · Edit trip' : 'Admin · New trip')
 
   const { data: categories } = useAdminCategories()
   const { data: trip, isLoading: loadingTrip } = useAdminTrip(isEdit ? id : null)
