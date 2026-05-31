@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
-import { Search, Trash2 } from 'lucide-react'
+import { Search, Trash2, Users as UsersIcon } from 'lucide-react'
 import Button from '../../components/Button'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import {
   useAdminUsers,
   useAdminUpdateUserRole,
@@ -31,6 +32,13 @@ function AdminUsersPage() {
   const { data, isLoading } = useAdminUsers(params)
   const updateRole = useAdminUpdateUserRole()
   const deleteUser = useAdminDeleteUser()
+
+  const hasFilters = Boolean(debouncedSearch || roleFilter)
+  const clearAll = () => {
+    setSearchInput('')
+    setRoleFilter('')
+    setPage(1)
+  }
 
   const toggleRole = (user) => {
     const nextRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN'
@@ -180,11 +188,20 @@ function AdminUsersPage() {
                     )
                   })}
               {!isLoading && data?.users.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-brand-muted">
-                    No users found.
-                  </td>
-                </tr>
+                <AdminEmptyState
+                  icon={UsersIcon}
+                  colSpan={6}
+                  hasFilters={hasFilters}
+                  firstRun={{
+                    heading: 'No users yet',
+                    body: 'Anyone who signs up or books as a guest will show up here.',
+                  }}
+                  filtered={{
+                    heading: 'No users match these filters',
+                    body: 'Try clearing the role filter or adjusting your search.',
+                    onClear: clearAll,
+                  }}
+                />
               )}
             </tbody>
           </table>

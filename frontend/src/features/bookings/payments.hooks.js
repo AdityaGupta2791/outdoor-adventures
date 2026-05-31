@@ -6,9 +6,11 @@ export function useRazorpayCheckout() {
   const qc = useQueryClient()
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState(null)
+  const [dismissedNotice, setDismissedNotice] = useState(null)
 
   async function startCheckout(booking) {
     setError(null)
+    setDismissedNotice(null)
     setIsProcessing(true)
     try {
       const scriptLoaded = await loadRazorpayScript()
@@ -63,6 +65,9 @@ export function useRazorpayCheckout() {
       return { status: 'confirmed', booking: confirmed }
     } catch (err) {
       if (err.message === 'DISMISSED') {
+        setDismissedNotice(
+          'Payment was cancelled. Your seats are still held — resume when you’re ready.',
+        )
         return { status: 'dismissed' }
       }
       setError(err.message || 'Something went wrong during payment.')
@@ -72,5 +77,12 @@ export function useRazorpayCheckout() {
     }
   }
 
-  return { startCheckout, isProcessing, error, clearError: () => setError(null) }
+  return {
+    startCheckout,
+    isProcessing,
+    error,
+    dismissedNotice,
+    clearError: () => setError(null),
+    clearDismissedNotice: () => setDismissedNotice(null),
+  }
 }

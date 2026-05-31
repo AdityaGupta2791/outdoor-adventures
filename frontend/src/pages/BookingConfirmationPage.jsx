@@ -21,7 +21,14 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle'
 function BookingConfirmationPage() {
   const { id } = useParams()
   const { data: booking, isLoading, isError } = useBooking(id)
-  const { startCheckout, isProcessing, error, clearError } = useRazorpayCheckout()
+  const {
+    startCheckout,
+    isProcessing,
+    error,
+    dismissedNotice,
+    clearError,
+    clearDismissedNotice,
+  } = useRazorpayCheckout()
   useDocumentTitle(booking ? `Booking ${booking.bookingRef}` : 'Booking')
 
   if (isLoading) return <ConfirmationSkeleton />
@@ -101,6 +108,12 @@ function BookingConfirmationPage() {
               </div>
             )}
 
+            {!error && dismissedNotice && (
+              <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+                {dismissedNotice}
+              </div>
+            )}
+
             <Button
               variant="primary"
               size="lg"
@@ -109,6 +122,7 @@ function BookingConfirmationPage() {
               disabled={isProcessing}
               onClick={() => {
                 clearError()
+                clearDismissedNotice()
                 startCheckout(booking)
               }}
             >

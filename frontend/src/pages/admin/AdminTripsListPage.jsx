@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Pencil, Trash2, X } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, X, Map } from 'lucide-react'
 import Button from '../../components/Button'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import {
   useAdminTrips,
   useAdminDeleteTrip,
@@ -241,11 +242,21 @@ function AdminTripsListPage() {
                     </tr>
                   ))}
               {!isLoading && data?.trips.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-brand-muted">
-                    No trips match your filters.
-                  </td>
-                </tr>
+                <AdminEmptyState
+                  icon={Map}
+                  colSpan={7}
+                  hasFilters={hasFilters}
+                  firstRun={{
+                    heading: 'No trips yet',
+                    body: 'Add your first trip to start building the catalog. You can publish it now or save as a draft.',
+                    cta: { to: '/admin/trips/new', label: 'Add your first trip', icon: Plus },
+                  }}
+                  filtered={{
+                    heading: 'No trips match these filters',
+                    body: 'Try clearing some filters or adjusting your search.',
+                    onClear: clearAll,
+                  }}
+                />
               )}
             </tbody>
           </table>

@@ -12,12 +12,14 @@ import {
   Users,
   Minus,
   Plus,
+  UserCheck,
 } from 'lucide-react'
 import Button from '../components/Button'
 import { useTrip } from '../features/trips/trips.hooks'
 import { useCreateBooking } from '../features/bookings/bookings.hooks'
 import { useRazorpayCheckout } from '../features/bookings/payments.hooks'
 import { loadRazorpayScript } from '../features/bookings/payments.api'
+import { useAuth } from '../features/auth/auth.hooks'
 import { formatINR, formatDateRange, difficultyLabel } from '../lib/format'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
@@ -39,8 +41,14 @@ function BookingPage() {
 
   const { data: trip, isLoading } = useTrip(slug)
   useDocumentTitle(trip ? `Book — ${trip.title}` : 'Book your trip')
+  const { user } = useAuth()
   const createBooking = useCreateBooking()
-  const { startCheckout, isProcessing, error: paymentError } = useRazorpayCheckout()
+  const {
+    startCheckout,
+    isProcessing,
+    error: paymentError,
+    dismissedNotice,
+  } = useRazorpayCheckout()
   const [pendingBooking, setPendingBooking] = useState(null)
 
   const departure = useMemo(
@@ -70,6 +78,32 @@ function BookingPage() {
   useEffect(() => {
     loadRazorpayScript()
   }, [])
+
+  // Prefill name + email from the logged-in user — only on initial mount when
+  // the user is loaded and the fields haven't been touched yet. Phone isn't on
+  // the User model so it stays empty. Booking for someone else? Just edit them.
+  const guestNameVal = watch('guestName')
+  const guestEmailVal = watch('guestEmail')
+  useEffect(() => {
+    if (!user) return
+    if (!guestNameVal && user.name) {
+      setValue('guestName', user.name, { shouldValidate: false })
+    }
+    if (!guestEmailVal && user.email) {
+      setValue('guestEmail', user.email, { shouldValidate: false })
+    }
+  }, [user?.id])
+
+  const usingOwnAccount =
+    !!user &&
+    guestNameVal?.trim() === user.name?.trim() &&
+    guestEmailVal?.trim().toLowerCase() === user.email?.trim().toLowerCase()
+
+  const restoreOwnDetails = () => {
+    if (!user) return
+    if (user.name) setValue('guestName', user.name, { shouldValidate: true })
+    if (user.email) setValue('guestEmail', user.email, { shouldValidate: true })
+  }
 
   if (isLoading) return <PageSkeleton />
 
@@ -154,6 +188,30 @@ function BookingPage() {
               <p className="mt-2 text-sm text-brand-muted">
                 We'll use these details to confirm your reservation and send trip prep guidance.
               </p>
+
+              {user && (
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+                  {usingOwnAccount ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/10 text-brand-primary font-medium">
+                      <UserCheck className="w-3.5 h-3.5" />
+                      Booking with your account
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-brand-muted">
+                        Booking for someone else? That's fine.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={restoreOwnDetails}
+                        className="font-semibold text-brand-accent hover:underline"
+                      >
+                        Use my details
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -203,6 +261,12 @@ function BookingPage() {
             {serverError && (
               <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
                 {serverError}
+              </div>
+            )}
+
+            {!serverError && dismissedNotice && (
+              <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+                {dismissedNotice}
               </div>
             )}
 

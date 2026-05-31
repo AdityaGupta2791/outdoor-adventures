@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Trash2, Pencil, X } from 'lucide-react'
+import { Search, Trash2, Pencil, X, Ticket } from 'lucide-react'
 import Button from '../../components/Button'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import {
   useAdminBookings,
   useAdminDeleteBooking,
@@ -56,6 +57,13 @@ function AdminBookingsListPage() {
   const { data, isLoading, isError } = useAdminBookings(params)
   const deleteBooking = useAdminDeleteBooking()
   const [editingBooking, setEditingBooking] = useState(null)
+
+  const hasFilters = Boolean(statusFilter || debouncedSearch)
+  const clearAll = () => {
+    setStatusFilter('')
+    setSearchInput('')
+    setPage(1)
+  }
 
   const handleDelete = (e, b) => {
     e.stopPropagation()
@@ -162,6 +170,15 @@ function AdminBookingsListPage() {
                         <div className="text-xs text-brand-muted truncate max-w-[15rem]">
                           {b.guestEmail}
                         </div>
+                        {b.guestPhone && (
+                          <a
+                            href={`tel:${b.guestPhone}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs font-mono text-brand-muted hover:text-brand-primary tabular-nums"
+                          >
+                            {b.guestPhone}
+                          </a>
+                        )}
                       </td>
                       <td className="px-5 py-3 text-brand-muted truncate max-w-[14rem]">
                         {b.departure.trip.title}
@@ -214,11 +231,20 @@ function AdminBookingsListPage() {
                     </tr>
                   ))}
               {!isLoading && data?.bookings.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-brand-muted">
-                    No bookings match your filters.
-                  </td>
-                </tr>
+                <AdminEmptyState
+                  icon={Ticket}
+                  colSpan={8}
+                  hasFilters={hasFilters}
+                  firstRun={{
+                    heading: 'No bookings yet',
+                    body: 'Customer reservations will appear here as soon as someone books a trip.',
+                  }}
+                  filtered={{
+                    heading: 'No bookings match these filters',
+                    body: 'Try clearing the status filter or adjusting your search.',
+                    onClear: clearAll,
+                  }}
+                />
               )}
             </tbody>
           </table>
