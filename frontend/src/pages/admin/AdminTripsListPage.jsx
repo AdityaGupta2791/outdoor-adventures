@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Pencil, Trash2, X, Map } from 'lucide-react'
+import { toast } from 'sonner'
 import Button from '../../components/Button'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import {
@@ -64,9 +65,9 @@ function AdminTripsListPage() {
       return
     }
     deleteTrip.mutate(trip.id, {
-      onError: (err) => {
-        window.alert(err?.response?.data?.error?.message || 'Failed to delete trip')
-      },
+      onSuccess: () => toast.success(`Deleted "${trip.title}"`),
+      onError: (err) =>
+        toast.error(err?.response?.data?.error?.message || 'Failed to delete trip'),
     })
   }
 

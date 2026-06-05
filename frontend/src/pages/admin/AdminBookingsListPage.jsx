@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Trash2, Pencil, X, Ticket } from 'lucide-react'
+import { toast } from 'sonner'
 import Button from '../../components/Button'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import {
@@ -79,9 +80,9 @@ function AdminBookingsListPage() {
       return
     }
     deleteBooking.mutate(b.id, {
-      onError: (err) => {
-        window.alert(err?.response?.data?.error?.message || 'Failed to delete booking')
-      },
+      onSuccess: () => toast.success(`Deleted ${b.bookingRef}`),
+      onError: (err) =>
+        toast.error(err?.response?.data?.error?.message || 'Failed to delete booking'),
     })
   }
 
@@ -300,6 +301,7 @@ function StatusEditModal({ booking, onClose }) {
     setError(null)
     try {
       await updateStatus.mutateAsync({ id: booking.id, status: newStatus })
+      toast.success(`${booking.bookingRef} marked ${STATUS_LABEL[newStatus] ?? newStatus}`)
       onClose()
     } catch (err) {
       setError(err?.response?.data?.error?.message || 'Failed to update status')

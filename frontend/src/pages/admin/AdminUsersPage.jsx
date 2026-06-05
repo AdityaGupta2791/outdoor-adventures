@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Search, Trash2, Users as UsersIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import Button from '../../components/Button'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import {
@@ -44,7 +45,14 @@ function AdminUsersPage() {
     const nextRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN'
     const verb = nextRole === 'ADMIN' ? 'promote' : 'demote'
     if (window.confirm(`Are you sure you want to ${verb} ${user.email} to ${nextRole}?`)) {
-      updateRole.mutate({ id: user.id, role: nextRole })
+      updateRole.mutate(
+        { id: user.id, role: nextRole },
+        {
+          onSuccess: () => toast.success(`${user.email} is now ${nextRole}`),
+          onError: (err) =>
+            toast.error(err?.response?.data?.error?.message || 'Failed to update role'),
+        },
+      )
     }
   }
 
@@ -59,9 +67,9 @@ function AdminUsersPage() {
       )
     ) {
       deleteUser.mutate(user.id, {
-        onError: (err) => {
-          window.alert(err?.response?.data?.error?.message || 'Failed to delete user')
-        },
+        onSuccess: () => toast.success(`Deleted ${user.email}`),
+        onError: (err) =>
+          toast.error(err?.response?.data?.error?.message || 'Failed to delete user'),
       })
     }
   }

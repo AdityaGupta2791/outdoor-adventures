@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Mail, Phone, Calendar, Users, Ticket, MapPin, XCircle } from 'lucide-react'
 import { useState } from 'react'
 import Button from '../../components/Button'
+import { toast } from 'sonner'
 import { useAdminBooking, useAdminCancelBooking } from '../../features/admin/admin.hooks'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { formatINR, formatDateRange } from '../../lib/format'
@@ -28,6 +29,7 @@ function AdminBookingDetailPage() {
     setError(null)
     try {
       await cancel.mutateAsync(booking.id)
+      toast.success(`${booking.bookingRef} cancelled — seats released`)
     } catch (err) {
       setError(err?.response?.data?.error?.message || 'Failed to cancel booking')
     }

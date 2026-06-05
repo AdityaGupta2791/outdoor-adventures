@@ -4,6 +4,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ArrowLeft, Plus, Trash2, Save, ExternalLink, Sparkles, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import Button from '../../components/Button'
 import {
   useAdminTrip,
@@ -198,8 +199,10 @@ function AdminTripFormPage() {
     try {
       if (isEdit) {
         await updateMut.mutateAsync({ id, data: payload })
+        toast.success('Trip saved')
       } else {
         const created = await createMut.mutateAsync(payload)
+        toast.success(`Created "${created.title}"`)
         navigate(`/admin/trips/${created.id}`, { replace: true })
         return
       }
@@ -488,6 +491,7 @@ function DeparturesManager({ tripId, departures }) {
           totalSeats: Number(form.totalSeats),
         },
       })
+      toast.success('Departure added')
       setForm({ startDate: '', endDate: '', priceInRupees: '', totalSeats: '' })
     } catch (err) {
       setError(err?.response?.data?.error?.message || 'Failed to add departure')
@@ -497,15 +501,23 @@ function DeparturesManager({ tripId, departures }) {
   const handleDelete = (id) => {
     if (window.confirm('Delete this departure?')) {
       remove.mutate(id, {
+        onSuccess: () => toast.success('Departure deleted'),
         onError: (err) =>
-          setError(err?.response?.data?.error?.message || 'Failed to delete departure'),
+          toast.error(err?.response?.data?.error?.message || 'Failed to delete departure'),
       })
     }
   }
 
   const toggleStatus = (d) => {
     const next = d.status === 'CANCELLED' ? 'OPEN' : 'CANCELLED'
-    update.mutate({ id: d.id, data: { status: next } })
+    update.mutate(
+      { id: d.id, data: { status: next } },
+      {
+        onSuccess: () => toast.success(next === 'OPEN' ? 'Departure reopened' : 'Departure cancelled'),
+        onError: (err) =>
+          toast.error(err?.response?.data?.error?.message || 'Failed to update departure'),
+      },
+    )
   }
 
   return (
